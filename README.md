@@ -150,15 +150,17 @@ function processTasks(tasks) {
         overdue: [],
     };
 
+    const currentDate = new Date();
     const logStatus = (task, status) => console.log(`Task ${task.name} is ${status}`);
+
 
     tasks.forEach(task => {
         const { status, dueDate, dateCompleted } = task;
-        const isOverdue = dueDate && new Date(dueDate) < new Date();
+        const isOverdue = dueDate && new Date(dueDate) < currentDate;
 
         switch (status) {
             case 'completed':
-                if (!dateCompleted) task.dateCompleted = new Date();
+                if (!dateCompleted) task.dateCompleted = currentDate;
                 result.completed.push(task);
                 logStatus(task, 'completed');
                 break;
