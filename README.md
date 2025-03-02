@@ -123,3 +123,58 @@ RESTful API — это архитектурный стиль для создан
 
 Используйте `JOIN`, если нужно объединить данные из нескольких таблиц, и `UNION`, если нужно объединить результаты двух однотипных запросов.
 
+
+# Задание 3. Рефакторинг
+
+## Читаемость:
+
+- Использование `for` с индексами (`i`) устарело. Лучше использовать `for...of` или методы массива, такие как `forEach`.
+- Логика внутри цикла слишком громоздкая, что затрудняет понимание.
+- Много повторяющегося кода, например, `console.log` с похожими сообщениями.
+
+## Производительность:
+
+- Код не оптимизирован для больших массивов, так как каждый вызов `new Date()` выполняется внутри цикла.
+
+## Поддержка:
+
+- Логика обработки статусов задач смешана в одном блоке, что усложняет добавление новых статусов или изменение существующих.
+
+## Улучшенный вариант:
+
+```javascript
+function processTasks(tasks) {
+    const result = {
+        completed: [],
+        pending: [],
+        overdue: [],
+    };
+
+    const logStatus = (task, status) => console.log(`Task ${task.name} is ${status}`);
+
+    tasks.forEach(task => {
+        const { status, dueDate, dateCompleted } = task;
+        const isOverdue = dueDate && new Date(dueDate) < new Date();
+
+        switch (status) {
+            case 'completed':
+                if (!dateCompleted) task.dateCompleted = new Date();
+                result.completed.push(task);
+                logStatus(task, 'completed');
+                break;
+            case 'pending':
+                isOverdue ? result.overdue.push(task) : result.pending.push(task);
+                logStatus(task, isOverdue ? 'overdue' : 'pending');
+                break;
+            case 'canceled':
+                logStatus(task, 'canceled');
+                break;
+            default:
+                logStatus(task, 'unknown');
+        }
+    });
+
+    return result;
+}
+```
+
